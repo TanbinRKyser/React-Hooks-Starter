@@ -5,18 +5,19 @@ import './IngredientForm.css';
 
 const IngredientForm = React.memo( props => {
   
-  // Declare states here
-  /* const [ inputState, setInputState ] = useState({
-    title: '', 
-    amount: ''
-  }); */
   const [ title, setTitle ] = useState('');
   const [ amount, setAmount ] = useState('');
 
 
   const submitHandler = event => {
+    
     event.preventDefault();
-    // ...
+    // passing it to Ingredients
+    props.addIngredient({ 
+      title: title,
+      amount: amount
+    });
+
   };
 
   return (
