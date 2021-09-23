@@ -1,4 +1,3 @@
-import './App.css';
 import Ingredients from './components/Ingredients/Ingredients';
 
 function App( props ) {
