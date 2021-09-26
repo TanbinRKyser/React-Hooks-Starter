@@ -12,7 +12,7 @@ const Search = React.memo( props => {
 
   useEffect( () => {
       
-    setTimeout( () => {
+    const timer = setTimeout( () => {
         if( filter === inputRef.current.value ){
           // carefully watch the backticks.
           const queryParams = 
@@ -36,7 +36,11 @@ const Search = React.memo( props => {
                 onLoadIngredients(loadedIngredients);
           });
         }
-      }, 500);
+    }, 500);
+
+    return () => {
+      clearTimeout( timer );
+    };
 
   },[ filter, onLoadIngredients, inputRef ]);
 

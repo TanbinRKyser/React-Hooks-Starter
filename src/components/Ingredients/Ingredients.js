@@ -9,23 +9,6 @@ function Ingredients() {
   const baseURL = 'URL';
   const [ ingredients, setIngredients ] = useState([]);
 
-  // Removed as we're already calling useEffect from Search.js
-  /* useEffect( () => {
-              fetch( baseURL + '/ingredients.json').then( response => response.json() ).then( resData => {  
-                const loadedIngredients = [];
-                
-                for( let key in resData ){
-                  loadedIngredients.push({
-                    id: key,
-                    title: resData[key].title,
-                    amount: resData[key].amount
-                  });
-                }
-
-                setIngredients( loadedIngredients );
-              })
-  }, []); */
-
   useEffect( () => {
     console.log( "RENDERING", ingredients )
   }, [ ingredients ]);
@@ -57,6 +40,19 @@ function Ingredients() {
     });
   }
 
+  const removeIngredientHandler = ingredientId => {
+    
+    fetch( baseURL + `/ingredients/${ ingredientId }.json`, {
+      // default method in firebase is GET
+              method: 'DELETE'
+    }).then( response => {
+        setIngredients( prevIngredients =>
+          prevIngredients.filter( ingredient => ingredient.id !== ingredientId )
+        );
+    });
+
+  }
+
   // using this function to search through the filtered ingredients
   const filteredIngredientsHandler = useCallback( filteredIngredients  => {
     setIngredients( filteredIngredients );
@@ -70,7 +66,9 @@ function Ingredients() {
       <section>
         <Search onLoadIngredients={ filteredIngredientsHandler }/>
         
-        <IngredientList ingredients={ ingredients } onRemoveItem = { () => {} }/>
+        <IngredientList
+          ingredients={ ingredients }
+          onRemoveItem={ removeIngredientHandler } />
       </section>
     </div>
   );
