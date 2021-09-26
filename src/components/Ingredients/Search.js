@@ -6,6 +6,7 @@ import './Search.css';
 const Search = React.memo( props => {
 
   const baseURL = 'URL';
+
   const [ filter, setFilter ] = useState('');
   const { onLoadIngredients } = props;
   const inputRef = useRef();
@@ -44,6 +45,7 @@ const Search = React.memo( props => {
 
   },[ filter, onLoadIngredients, inputRef ]);
 
+
   return (
     <section className="search">
       <Card>
@@ -58,6 +60,7 @@ const Search = React.memo( props => {
       </Card>
     </section>
   );
+
 });
 
 export default Search;
