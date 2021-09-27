@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useCallback } from 'react';
+import React, { useReducer, useCallback, useMemo } from 'react';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from '../Ingredients/IngredientList';
@@ -41,13 +41,9 @@ function Ingredients() {
 
   const baseURL = 'URL';
 
-  useEffect( () => {
-    console.log( "RENDERING", ingredients )
-  }, [ ingredients ]);
-
 
   // Getting data from IngredientForm and adding it current list of ingredients.
-  const addIngredientHandler = ingredient => {
+  const addIngredientHandler = useCallback(ingredient => {
 
     dispatchHttp({ type: 'SEND' });
 
@@ -65,12 +61,12 @@ function Ingredients() {
         dispatchIngredients({ type: 'ADD', ingredients: { 
                                 id: data.name, 
                                 ...ingredient } 
-        })
+        });
     });
-  }
+  }, []);
 
   // Remove Data
-  const removeIngredientHandler = ingredientId => {
+  const removeIngredientHandler = useCallback(ingredientId => {
     dispatchHttp({ type: 'SEND' });
 
     fetch( baseURL + `/ingredients/${ ingredientId }.json`, {
@@ -81,17 +77,25 @@ function Ingredients() {
     }).catch( error => {
         dispatchHttp({ type: 'ERROR', errorMessage: error.message });
     });
-  }
+  }, []);
 
   // GET data
   const filteredIngredientsHandler = useCallback( filteredIngredients  => {
     dispatchIngredients({ type: 'SET', ingredients: filteredIngredients });
   }, [] );
 
-  const clearError = () => {
-
+  // clicking on the modal and getting it close.
+  const clearError = useCallback( () => {
     dispatchHttp({ type: 'CLEAR' });
-  }
+  }, [] );
+
+  // Memorising the component via useMemo()
+  const ingredientList = useMemo( () => {
+    return <IngredientList
+              ingredients={ ingredients }
+              onRemoveItem={ removeIngredientHandler }  />
+  }, [ ingredients, removeIngredientHandler ]);
+
 
   return (
     <div className="App">
@@ -107,9 +111,7 @@ function Ingredients() {
       <section>
         <Search onLoadIngredients={ filteredIngredientsHandler }  />
         
-        <IngredientList
-          ingredients={ ingredients }
-          onRemoveItem={ removeIngredientHandler }  />
+        { ingredientList}
       </section>
     </div>
   );
