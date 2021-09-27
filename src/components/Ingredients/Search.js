@@ -15,7 +15,7 @@ const Search = React.memo( props => {
       
     const timer = setTimeout( () => {
         if( filter === inputRef.current.value ){
-          // carefully watch the backticks.
+          
           const queryParams = 
             filter.length === 0 
             ? '' 
