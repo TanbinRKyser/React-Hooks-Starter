@@ -1,7 +1,10 @@
 import React,{ useState, useEffect, useRef } from 'react';
 
 import Card from '../UI/Card';
+import ErrorModal from '../UI/ErrorModal';
 import './Search.css';
+import useHttp from '../../hooks/http';
+
 
 const Search = React.memo( props => {
 
@@ -10,32 +13,18 @@ const Search = React.memo( props => {
   const [ filter, setFilter ] = useState('');
   const { onLoadIngredients } = props;
   const inputRef = useRef();
+  const { loading, error, data, sendRequest, clearAll } = useHttp();
+
 
   useEffect( () => {
-      
     const timer = setTimeout( () => {
         if( filter === inputRef.current.value ){
-          
           const queryParams = 
             filter.length === 0 
             ? '' 
             : `?orderBy="title"&equalTo="${filter}"`;
 
-          fetch( baseURL + '/ingredients.json' + queryParams )
-            .then( response => response.json() )
-              .then( resData => {  
-                const loadedIngredients = [];
-                
-                for( let key in resData ){
-                  loadedIngredients.push({
-                    id: key,
-                    title: resData[key].title,
-                    amount: resData[key].amount
-                  });
-                }
-                //...
-                onLoadIngredients(loadedIngredients);
-          });
+          sendRequest( baseURL + '/ingredients.json' + queryParams, 'GET', );
         }
     }, 500);
 
@@ -43,14 +32,34 @@ const Search = React.memo( props => {
       clearTimeout( timer );
     };
 
-  },[ filter, onLoadIngredients, inputRef ]);
+  },[ filter, inputRef, sendRequest ]);
+
+  useEffect( () => {
+    if( !loading && !error && data ){
+      const loadedIngredients = [];
+      for( let key in data ){
+        loadedIngredients.push({
+          id: key,
+          title: data[ key ].title,
+          amount: data[ key ].amount
+        });
+      }
+      onLoadIngredients(loadedIngredients);
+    }
+  }, [ loading, error, data, onLoadIngredients ]);
 
 
   return (
     <section className="search">
+      
+      { error && <ErrorModal onClose={ clearAll }>{ error }</ErrorModal> }
+
       <Card>
         <div className="search-input">
           <label>Filter by Title</label>
+          
+          { loading && <span>Loading...</span> }
+
           <input 
             ref={ inputRef }
             type="text" 
@@ -58,6 +67,7 @@ const Search = React.memo( props => {
             onChange={ event => setFilter( event.target.value ) }  />
         </div>
       </Card>
+
     </section>
   );
 
